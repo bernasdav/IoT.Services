@@ -29,7 +29,7 @@ namespace IoT.Services.EventBus
         private IModel consumerChannel;
         private string queueName;
 
-        public EventBusService(EventHandlerList<IIntegrationEventHandler> list)
+        public EventBusService()
         {
             persistentConnection = new DefaultRabbitMQPersistentConnection(new ConnectionFactory { HostName = "localhost" });
             subsManager = new InMemoryEventBusSubscriptionsManager();
@@ -37,7 +37,8 @@ namespace IoT.Services.EventBus
             consumerChannel = CreateConsumerChannel();
 
             builder = new ContainerBuilder();
-            builder.RegisterType<>();
+            builder.RegisterType<IntegrationEvent>();
+            builder.RegisterType<IntegrationEventHandler>();
             autofac = builder.Build();
 
             retryCount = 5;

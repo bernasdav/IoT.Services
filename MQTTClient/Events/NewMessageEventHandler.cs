@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IoT.Services.MqttServices.Events
 {
-    class NewMessageEventHandler : IIntegrationEventHandler<NewMessageEvent>
+    class NewMessageEventHandler : IntegrationEventHandler, IIntegrationEventHandler<NewMessageEvent>
     {
         public Task Handle(NewMessageEvent @event)
         {

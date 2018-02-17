@@ -13,7 +13,7 @@ namespace MQTTClient
     {
         private static Mqtt.MqttService client;
         private static DockerLifeTimeHandler dockerLifeTimeHandler;
-        private static EventBusService<NewMessageEventHandler> eventBus;
+        private static EventBusService eventBus;
 
         static void Main(string[] args)
         {
@@ -49,7 +49,7 @@ namespace MQTTClient
         private static void DockerLifeTimeHandler_Starting(object sender, EventArgs e)
         {
             client = new Mqtt.MqttService();
-            eventBus = new EventBusService<NewMessageEventHandler>();
+            eventBus = new EventBusService();
             eventBus.Subscribe<NewMessageEvent, NewMessageEventHandler>();
             SimulateEvent();
         }
