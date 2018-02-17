@@ -23,11 +23,9 @@ namespace IoT.Services.EventBus
         private readonly IRabbitMQPersistentConnection persistentConnection;
         private readonly IEventBusSubscriptionsManager subsManager;
         private readonly int retryCount;
-        private IContainer autofac;
-        private ContainerBuilder builder;
-        private readonly string AutofacScopeName = "IotEventBus";
         private IModel consumerChannel;
         private string queueName;
+        private Dictionary<string, IContainer> containers;
 
         public EventBusService()
         {
@@ -35,12 +33,7 @@ namespace IoT.Services.EventBus
             subsManager = new InMemoryEventBusSubscriptionsManager();
             queueName = brokerName;
             consumerChannel = CreateConsumerChannel();
-
-            builder = new ContainerBuilder();
-            builder.RegisterType<IntegrationEvent>();
-            builder.RegisterType<IntegrationEventHandler>();
-            autofac = builder.Build();
-
+            containers = new Dictionary<string, IContainer>();
             retryCount = 5;
             subsManager.OnEventRemoved += SubsManagerOnEventRemoved;
         }
@@ -115,6 +108,29 @@ namespace IoT.Services.EventBus
             var eventName = subsManager.GetEventKey<T>();
             DoInternalSubscription(eventName);
             subsManager.AddSubscription<T, TH>();
+            AddContainer<T, TH>();
+        }
+
+        private void AddContainer<T, TH>()
+            where T : IntegrationEvent
+            where TH : IIntegrationEventHandler<T>
+        {
+            var eventName = subsManager.GetEventKey<T>();
+            if (!containers.ContainsKey(eventName))
+            {
+                var b = new ContainerBuilder();
+                b.RegisterType<TH>();
+                IContainer container = b.Build();
+                containers.Add(eventName, container);
+            }
+        }
+
+        private void RemoveContainer(string eventName)
+        {
+            if (containers.ContainsKey(eventName))
+            {
+                containers.Remove(eventName);
+            }
         }
 
         private void DoInternalSubscription(string eventName)
@@ -141,6 +157,7 @@ namespace IoT.Services.EventBus
             where T : IntegrationEvent
         {
             subsManager.RemoveSubscription<T, TH>();
+            RemoveContainer(subsManager.GetEventKey<T>());
         }
 
         public void UnsubscribeDynamic<TH>(string eventName)
@@ -204,23 +221,18 @@ namespace IoT.Services.EventBus
         {
             if (subsManager.HasSubscriptionsForEvent(eventName))
             {
-                using (var scope = autofac.BeginLifetimeScope(AutofacScopeName))
+                var subscriptions = subsManager.GetHandlersForEvent(eventName);
+                foreach (var subscription in subscriptions)
                 {
-                    var subscriptions = subsManager.GetHandlersForEvent(eventName);
-                    foreach (var subscription in subscriptions)
+                    var eventType = subsManager.GetEventTypeByName(eventName);
+                    var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                    var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
+                    if (containers.ContainsKey(eventName))
                     {
-                        if (subscription.IsDynamic)
+                        var handlerContainer = containers[eventName];
+                        using (var handlerScope = handlerContainer.BeginLifetimeScope())
                         {
-                            var handler = scope.ResolveOptional(subscription.HandlerType) as IDynamicIntegrationEventHandler;
-                            dynamic eventData = JObject.Parse(message);
-                            await handler.Handle(eventData);
-                        }
-                        else
-                        {
-                            var eventType = subsManager.GetEventTypeByName(eventName);
-                            var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
-                            var handler = scope.ResolveOptional(subscription.HandlerType);
-                            var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                            var handler = handlerScope.ResolveOptional(subscription.HandlerType);
                             await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent });
                         }
                     }

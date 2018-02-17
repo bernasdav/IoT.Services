@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IoT.Services.EventBus.Events
 {
-    public class IntegrationEventHandler
+    public abstract class IntegrationEventHandler : IIntegrationEventHandler
     {
     }
 }

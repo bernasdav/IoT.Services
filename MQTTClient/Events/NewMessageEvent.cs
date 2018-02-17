@@ -7,5 +7,6 @@ namespace IoT.Services.MqttServices.Events
 {
     class NewMessageEvent : IntegrationEvent
     {
+        public string Message => "Hallo";
     }
 }
