@@ -10,6 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\IoT.Services.Contracts\IoT.Services.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update=".dockerignore">
       <DependentUpon>Dockerfile</DependentUpon>
     </None>

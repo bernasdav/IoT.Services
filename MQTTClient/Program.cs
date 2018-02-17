@@ -6,7 +6,7 @@ namespace MQTTClient
 {
     class Program
     {
-        private static Mqtt.MqttServiceClient client;
+        private static Mqtt.MqttService client;
         private static DockerLifeTimeHandler dockerLifeTimeHandler;
 
         static void Main(string[] args)
@@ -29,19 +29,20 @@ namespace MQTTClient
                 int nr = 1;
                 while (true)
                 {
-                    await client.Publish("testtopic/receive", nr.ToString());
+                    var msg = new IoT.Services.Contracts.MqttMessage(1.ToString());
+                    await client.Publish("testtopic/receive", msg);
                     Logging.Logger.Info("Sending");
                     nr++;
                     if (nr == 4) nr = 1;
-                    Thread.Sleep(50);
+                    Thread.Sleep(1000);
                 }                
             });
         }
 
         private static void DockerLifeTimeHandler_Starting(object sender, EventArgs e)
         {
-            client = new Mqtt.MqttServiceClient();
-            SimulateSend();
+            client = new Mqtt.MqttService();
+            //SimulateSend();
         }
     }
 }
