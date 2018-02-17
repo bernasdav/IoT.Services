@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  mqttclient:
+    image: mqttclient
+    build:
+      context: ./MQTTClient
+      dockerfile: Dockerfile
