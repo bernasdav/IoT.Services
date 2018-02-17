@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTClient", "MQTTClient\MQTTClient.csproj", "{9DA13A70-FAD0-4C4E-BA74-D497E26EAA29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoT.Services.MqttServices", "MQTTClient\IoT.Services.MqttServices.csproj", "{9DA13A70-FAD0-4C4E-BA74-D497E26EAA29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoT.Services.Contracts", "IoT.Services.Contracts\IoT.Services.Contracts.csproj", "{74E80FA4-4909-4423-8E4F-03D828086FE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{9DA13A70-FAD0-4C4E-BA74-D497E26EAA29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DA13A70-FAD0-4C4E-BA74-D497E26EAA29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DA13A70-FAD0-4C4E-BA74-D497E26EAA29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74E80FA4-4909-4423-8E4F-03D828086FE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74E80FA4-4909-4423-8E4F-03D828086FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74E80FA4-4909-4423-8E4F-03D828086FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74E80FA4-4909-4423-8E4F-03D828086FE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
