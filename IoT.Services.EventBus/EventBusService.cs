@@ -10,6 +10,7 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -101,20 +102,13 @@ namespace IoT.Services.EventBus
             }
         }
 
-        public void SubscribeDynamic<TH>(string eventName)
-            where TH : IDynamicIntegrationEventHandler
-        {
-            DoInternalSubscription(eventName);
-            subsManager.AddDynamicSubscription<TH>(eventName);
-        }
 
-        public void Subscribe<T, TH>()
+        public void Subscribe<T>(Action action)
             where T : IntegrationEvent
-            where TH : IIntegrationEventHandler<T>
         {
             var eventName = subsManager.GetEventKey<T>();
             DoInternalSubscription(eventName);
-            subsManager.AddSubscription<T, TH>();
+            subsManager.AddSubscription<T>(action);
         }
 
         private void DoInternalSubscription(string eventName)
@@ -136,17 +130,10 @@ namespace IoT.Services.EventBus
             }
         }
 
-        public void Unsubscribe<T, TH>()
-            where TH : IIntegrationEventHandler<T>
+        public void Unsubscribe<T>()
             where T : IntegrationEvent
         {
-            subsManager.RemoveSubscription<T, TH>();
-        }
-
-        public void UnsubscribeDynamic<TH>(string eventName)
-            where TH : IDynamicIntegrationEventHandler
-        {
-            subsManager.RemoveDynamicSubscription<TH>(eventName);
+            subsManager.RemoveSubscription<T>();
         }
 
         public void Dispose()
@@ -204,27 +191,10 @@ namespace IoT.Services.EventBus
         {
             if (subsManager.HasSubscriptionsForEvent(eventName))
             {
-                using (var scope = autofac.BeginLifetimeScope(AutofacScopeName))
+                await Task.Run(() =>
                 {
-                    var subscriptions = subsManager.GetHandlersForEvent(eventName);
-                    foreach (var subscription in subscriptions)
-                    {
-                        if (subscription.IsDynamic)
-                        {
-                            var handler = scope.ResolveOptional(subscription.HandlerType) as IDynamicIntegrationEventHandler;
-                            dynamic eventData = JObject.Parse(message);
-                            await handler.Handle(eventData);
-                        }
-                        else
-                        {
-                            var eventType = subsManager.GetEventTypeByName(eventName);
-                            var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
-                            var handler = scope.ResolveOptional(subscription.HandlerType);
-                            var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-                            await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent });
-                        }
-                    }
-                }
+                    subsManager.GetHandlersForEvent(eventName).First()?.Invoke();
+                });
             }
         }
     }

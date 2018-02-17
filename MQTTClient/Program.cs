@@ -50,7 +50,8 @@ namespace MQTTClient
         {
             client = new Mqtt.MqttService();
             eventBus = new EventBusService();
-            eventBus.Subscribe<NewMessageEvent, NewMessageEventHandler>();
+            var handler = new NewMessageEventHandler();
+            eventBus.Subscribe<NewMessageEvent>(handler.Handle());
             SimulateEvent();
         }
 
