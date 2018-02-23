@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IoT.Services.EventBus.Events
+namespace IoT.Services.Contracts.Eventing
 {
     public class IntegrationEvent
     {

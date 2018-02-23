@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using IoT.Services.Contracts;
+using IoT.Services.Contracts.Messaging;
 
 namespace MQTTClient.Mqtt
 {

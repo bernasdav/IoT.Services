@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Text;
 
-namespace IoT.Services.Contracts
+namespace IoT.Services.Contracts.Messaging
 {
     /// <summary>
     /// The message contract
@@ -14,7 +15,13 @@ namespace IoT.Services.Contracts
         /// <param name="payload">the message of the payload.</param>
         public MqttMessage(string payload)
         {
-            Payload = payload;
+            Payload = new Payload();
+            Payload.PayloadText = payload;
+        }
+
+        public MqttMessage()
+        {
+            Payload = new Payload();
         }
 
         /// <summary>
@@ -28,21 +35,36 @@ namespace IoT.Services.Contracts
             {
                 sb.Append((char)c);
             }
-            Payload = sb.ToString();
+            Payload = DeserializePayload(sb.ToString());
         }
 
         /// <summary>
         /// The message payload.
         /// </summary>
-        public string Payload { get; private set; }
+        public Payload Payload { get; set; }
+
+        /// <summary>
+        /// The serialized Json payload.
+        /// </summary>
+        public string SerializedPayload { get; set; }
 
         /// <summary>
         /// Converts the messag payload to a byte array.
         /// </summary>
         /// <returns>The payload as a byte array.</returns>
-        public byte[] ToByteArray()
+        public byte[] PayloadByteArray()
         {
-            return Encoding.ASCII.GetBytes(Payload);
+            return Encoding.ASCII.GetBytes(Payload.PayloadText);
+        }
+
+        private Payload DeserializePayload(string payload)
+        {
+            return JsonConvert.DeserializeObject<Payload>(payload);
+        }
+
+        private string SerializePayload(string payload)
+        {
+            return JsonConvert.SerializeObject(payload);
         }
     }
 }

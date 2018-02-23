@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 
-namespace IoT.Services.EventBus.Events
+namespace IoT.Services.Contracts.Eventing
 {
     public interface IIntegrationEventHandler<in TIntegrationEvent> : IIntegrationEventHandler 
         where TIntegrationEvent: IntegrationEvent
     {
-        Task Handle(TIntegrationEvent @event);
+        void Handle(TIntegrationEvent @event);
     }
 
     public interface IIntegrationEventHandler

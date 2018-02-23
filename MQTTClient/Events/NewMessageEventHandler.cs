@@ -1,20 +1,27 @@
-﻿using IoT.Services.EventBus.Events;
-using MQTTClient.Logging;
+﻿using MQTTClient.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using IoT.Services.Contracts.Eventing;
+using MQTTClient.Mqtt;
 
 namespace IoT.Services.MqttServices.Events
 {
-    class NewMessageEventHandler : IntegrationEventHandler, IIntegrationEventHandler<NewMessageEvent>
+    class NewMessageEventHandler : IntegrationEvent, IIntegrationEventHandler<NewMessageEvent>
     {
-        public Task Handle(NewMessageEvent @event)
+        private MqttService mqttService;
+
+        public NewMessageEventHandler(MqttService service)
         {
-            return Task.Run(() =>
-            {
-                Logger.Info($"Processing event: {@event.Message}");
-            });
+            mqttService = service;
+        }
+
+        public async void Handle(NewMessageEvent @event)
+        {
+
+            Logger.Info($"Processing event: {@event.Message.Payload}");
+            await mqttService.Publish("testtopic/receive", @event.Message);
         }
     }
 }

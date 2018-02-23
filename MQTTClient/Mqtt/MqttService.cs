@@ -1,7 +1,7 @@
 ﻿using MQTTClient.Logging;
 using System;
 using System.Threading.Tasks;
-using IoT.Services.Contracts;
+using IoT.Services.Contracts.Messaging;
 
 namespace MQTTClient.Mqtt
 {
@@ -20,8 +20,8 @@ namespace MQTTClient.Mqtt
         /// </summary>
         public MqttService()
         {
-            client = new MqttClient("localhost");
-            client.Connect(Guid.NewGuid().ToString());
+            client = new MqttClient("davidber.ddns.net");
+            client.Connect(Guid.NewGuid().ToString(), "client", "client");
             topics[0] = "testtopic/devices";
             topics[1] = "testtopic/receive";
             qos[0] = 1;
@@ -33,7 +33,7 @@ namespace MQTTClient.Mqtt
 
         private void OnMqttMsgPublishReceived(object sender, MqttMessageEventArgs e)
         {
-            Logger.Info($"New message: {e.Message.Payload}.");
+            Logger.Info($"New message: Message Type: {e.Message.Payload.PayloadType.ToString()} Payload: {e.Message.Payload.PayloadText}.");
         }
 
         /// <summary>

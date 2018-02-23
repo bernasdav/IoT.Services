@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using M2MNetworking = uPLibrary.Networking.M2Mqtt;
 using M2MMessaging = uPLibrary.Networking.M2Mqtt.Messages;
 using MQTTClient.Logging;
-using IoT.Services.Contracts;
+using IoT.Services.Contracts.Messaging;
 
 namespace MQTTClient.Mqtt
 {
@@ -33,9 +33,18 @@ namespace MQTTClient.Mqtt
 
         private void OnClientMqttMsgPublishReceived(object sender, M2MMessaging.MqttMsgPublishEventArgs e)
         {
-            if (OnMqttMsgPublishReceived == null) return;
-            var msg = new MqttMessage(e.Message);
-            OnMqttMsgPublishReceived.Invoke(sender, new MqttMessageEventArgs { Message = msg});
+            try
+            {
+                if (OnMqttMsgPublishReceived == null) return;
+                var msg = new MqttMessage(e.Message);
+                OnMqttMsgPublishReceived.Invoke(sender, new MqttMessageEventArgs { Message = msg });
+            }
+            catch (Exception ex)
+            {
+
+                Logger.Error(ex.Message);
+            }
+            
         }
 
         /// <summary>
@@ -67,7 +76,7 @@ namespace MQTTClient.Mqtt
         {
             await Task.Run(() =>
             {
-                client.Publish(topic, message.ToByteArray());
+                client.Publish(topic, message.PayloadByteArray());
             });
         }
 

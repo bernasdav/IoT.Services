@@ -2,10 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using IoT.Services.EventBus;
-using IoT.Services.EventBus.Events;
 using IoT.Services.MqttServices.Events;
 using Autofac;
 using System.Collections.Generic;
+using IoT.Services.Contracts.Eventing;
+using IoT.Services.Contracts.Messaging;
 
 namespace MQTTClient
 {
@@ -36,7 +37,7 @@ namespace MQTTClient
                 int nr = 1;
                 while (true)
                 {
-                    var msg = new IoT.Services.Contracts.MqttMessage(1.ToString());
+                    var msg = new IoT.Services.Contracts.Messaging.MqttMessage(1.ToString());
                     await client.Publish("testtopic/receive", msg);
                     Logging.Logger.Info("Sending");
                     nr++;
@@ -50,13 +51,21 @@ namespace MQTTClient
         {
             client = new Mqtt.MqttService();
             eventBus = new EventBusService();
-            eventBus.Subscribe<NewMessageEvent, NewMessageEventHandler>();
+            Action<IntegrationEvent> eventHandlerDelegate = (@event) =>
+            {
+                var handler = new NewMessageEventHandler(client);
+                handler.Handle((NewMessageEvent)@event);
+            };
+            eventBus.Subscribe<NewMessageEvent>(eventHandlerDelegate);
             SimulateEvent();
         }
+
 
         private static void SimulateEvent()
         {
             var @event = new NewMessageEvent();
+            @event.Message = new MqttMessage();
+            @event.Message.Payload.PayloadText = "1";
             eventBus.Publish(@event);
         }
     }

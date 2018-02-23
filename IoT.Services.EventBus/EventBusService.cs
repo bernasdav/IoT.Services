@@ -1,5 +1,4 @@
-﻿using Autofac;
-using IoT.Services.EventBus.Events;
+﻿using IoT.Services.Contracts.Eventing;
 using IoT.Services.EventBus.RabbitMQ;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -25,7 +24,6 @@ namespace IoT.Services.EventBus
         private readonly int retryCount;
         private IModel consumerChannel;
         private string queueName;
-        private Dictionary<string, IContainer> containers;
 
         public EventBusService()
         {
@@ -33,7 +31,6 @@ namespace IoT.Services.EventBus
             subsManager = new InMemoryEventBusSubscriptionsManager();
             queueName = brokerName;
             consumerChannel = CreateConsumerChannel();
-            containers = new Dictionary<string, IContainer>();
             retryCount = 5;
             subsManager.OnEventRemoved += SubsManagerOnEventRemoved;
         }
@@ -94,43 +91,13 @@ namespace IoT.Services.EventBus
             }
         }
 
-        public void SubscribeDynamic<TH>(string eventName)
-            where TH : IDynamicIntegrationEventHandler
-        {
-            DoInternalSubscription(eventName);
-            subsManager.AddDynamicSubscription<TH>(eventName);
-        }
 
-        public void Subscribe<T, TH>()
+        public void Subscribe<T>(Action<IntegrationEvent> action)
             where T : IntegrationEvent
-            where TH : IIntegrationEventHandler<T>
         {
             var eventName = subsManager.GetEventKey<T>();
             DoInternalSubscription(eventName);
-            subsManager.AddSubscription<T, TH>();
-            AddContainer<T, TH>();
-        }
-
-        private void AddContainer<T, TH>()
-            where T : IntegrationEvent
-            where TH : IIntegrationEventHandler<T>
-        {
-            var eventName = subsManager.GetEventKey<T>();
-            if (!containers.ContainsKey(eventName))
-            {
-                var b = new ContainerBuilder();
-                b.RegisterType<TH>();
-                IContainer container = b.Build();
-                containers.Add(eventName, container);
-            }
-        }
-
-        private void RemoveContainer(string eventName)
-        {
-            if (containers.ContainsKey(eventName))
-            {
-                containers.Remove(eventName);
-            }
+            subsManager.AddSubscription<T>(action);
         }
 
         private void DoInternalSubscription(string eventName)
@@ -152,18 +119,10 @@ namespace IoT.Services.EventBus
             }
         }
 
-        public void Unsubscribe<T, TH>()
-            where TH : IIntegrationEventHandler<T>
+        public void Unsubscribe<T>()
             where T : IntegrationEvent
         {
-            subsManager.RemoveSubscription<T, TH>();
-            RemoveContainer(subsManager.GetEventKey<T>());
-        }
-
-        public void UnsubscribeDynamic<TH>(string eventName)
-            where TH : IDynamicIntegrationEventHandler
-        {
-            subsManager.RemoveDynamicSubscription<TH>(eventName);
+            subsManager.RemoveSubscription<T>();
         }
 
         public void Dispose()
@@ -221,22 +180,13 @@ namespace IoT.Services.EventBus
         {
             if (subsManager.HasSubscriptionsForEvent(eventName))
             {
-                var subscriptions = subsManager.GetHandlersForEvent(eventName);
-                foreach (var subscription in subscriptions)
+                var actionDelegate = subsManager.GetHandlerForEvent(eventName);
+                var eventType = subsManager.GetEventTypeByName(eventName);
+                var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
+                await Task.Run(() =>
                 {
-                    var eventType = subsManager.GetEventTypeByName(eventName);
-                    var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-                    var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
-                    if (containers.ContainsKey(eventName))
-                    {
-                        var handlerContainer = containers[eventName];
-                        using (var handlerScope = handlerContainer.BeginLifetimeScope())
-                        {
-                            var handler = handlerScope.ResolveOptional(subscription.HandlerType);
-                            await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent });
-                        }
-                    }
-                }
+                    actionDelegate?.Invoke((IntegrationEvent)integrationEvent);
+                });
             }
         }
     }
