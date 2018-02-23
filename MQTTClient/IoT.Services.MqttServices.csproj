@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="M2MqttDotnetCore" Version="1.0.7" />
+    <PackageReference Include="Polly" Version="5.8.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,12 +5,26 @@ namespace IoT.Services.EventBus
 { 
     interface IEventBus
     {
-        void Publish(IntegrationEvent @event);
+        /// <summary>
+        /// Publishes an event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        void Publish(IntegrationEventBase @event);
 
-        void Subscribe<T>(Action<IntegrationEvent> action)
-            where T : IntegrationEvent;
+        /// <summary>
+        /// Subscribes an event handler for an event.
+        /// </summary>
+        /// <typeparam name="T">The event.</typeparam>
+        /// <param name="action">The event handler.</param>
+        void Subscribe<T>(Action<IntegrationEventBase> action)
+            where T : IntegrationEventBase;
 
-         void Unsubscribe<T>()
-            where T : IntegrationEvent;
+
+        /// <summary>
+        /// Unsubscribes an event handler for an event.
+        /// </summary>
+        /// <typeparam name="T">The event.</typeparam>
+        void Unsubscribe<T>()
+            where T : IntegrationEventBase;
     }
 }

@@ -6,6 +6,9 @@ using M2MNetworking = uPLibrary.Networking.M2Mqtt;
 using M2MMessaging = uPLibrary.Networking.M2Mqtt.Messages;
 using MQTTClient.Logging;
 using IoT.Services.Contracts.Messaging;
+using Polly;
+using Polly.Retry;
+using uPLibrary.Networking.M2Mqtt.Exceptions;
 
 namespace MQTTClient.Mqtt
 {
@@ -44,7 +47,7 @@ namespace MQTTClient.Mqtt
 
                 Logger.Error(ex.Message);
             }
-            
+
         }
 
         /// <summary>
@@ -55,7 +58,19 @@ namespace MQTTClient.Mqtt
         /// <param name="password">The password.</param>
         public void Connect(string clientId, string username, string password)
         {
-            client.Connect(clientId, username, password);
+            // Wait and retry forever, calling an action on each retry with the 
+            // current exception and the time to wait
+            Policy
+              .Handle<Exception>()
+              .WaitAndRetryForever(
+                retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (exception, timespan) =>
+                {
+                    Logger.Error("Failed to connect. Retrying.");
+                }).Execute(() =>
+                {
+                    client.Connect(clientId, username, password);
+                });
         }
 
         /// <summary>
@@ -63,6 +78,7 @@ namespace MQTTClient.Mqtt
         /// </summary>
         public void Connect(string clientId)
         {
+
             client.Connect(clientId);
         }
 
@@ -74,10 +90,20 @@ namespace MQTTClient.Mqtt
         /// <returns></returns>
         public async Task Publish(string topic, MqttMessage message)
         {
-            await Task.Run(() =>
-            {
-                client.Publish(topic, message.PayloadByteArray());
-            });
+            await Policy.Handle<Exception>()
+                 .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (exception, timeSpan, context) =>
+                                 {
+                                     Logger.Error("Error while publishing. Retrying");
+                                 }
+                              ).ExecuteAsync(async () =>
+                              {
+                                  await Task.Run(() =>
+                                  {
+                                      client.Publish(topic, message.PayloadByteArray());
+                                  });
+
+                              });
+
         }
 
         /// <summary>

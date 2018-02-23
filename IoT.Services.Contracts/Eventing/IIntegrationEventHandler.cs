@@ -3,7 +3,7 @@
 namespace IoT.Services.Contracts.Eventing
 {
     public interface IIntegrationEventHandler<in TIntegrationEvent> : IIntegrationEventHandler 
-        where TIntegrationEvent: IntegrationEvent
+        where TIntegrationEvent: IntegrationEventBase
     {
         void Handle(TIntegrationEvent @event);
     }

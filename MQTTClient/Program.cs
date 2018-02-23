@@ -51,19 +51,19 @@ namespace MQTTClient
         {
             client = new Mqtt.MqttService();
             eventBus = new EventBusService();
-            Action<IntegrationEvent> eventHandlerDelegate = (@event) =>
+            Action<IntegrationEventBase> eventHandlerDelegate = (@event) =>
             {
                 var handler = new NewMessageEventHandler(client);
-                handler.Handle((NewMessageEvent)@event);
+                handler.Handle((NewMqttMessageEvent)@event);
             };
-            eventBus.Subscribe<NewMessageEvent>(eventHandlerDelegate);
+            eventBus.Subscribe<NewMqttMessageEvent>(eventHandlerDelegate);
             SimulateEvent();
         }
 
 
         private static void SimulateEvent()
         {
-            var @event = new NewMessageEvent();
+            var @event = new NewMqttMessageEvent();
             @event.Message = new MqttMessage();
             @event.Message.Payload.PayloadText = "1";
             eventBus.Publish(@event);

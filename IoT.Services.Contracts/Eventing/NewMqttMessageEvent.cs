@@ -6,8 +6,14 @@ using IoT.Services.Contracts.Messaging;
 
 namespace IoT.Services.MqttServices.Events
 {
-    public class NewMessageEvent : IntegrationEvent
+    /// <summary>
+    /// An event raised when a new mqtt message is received.
+    /// </summary>
+    public class NewMqttMessageEvent : IntegrationEventBase
     {
+        /// <summary>
+        /// The <see cref="MqttMessage"/>
+        /// </summary>
         public MqttMessage Message { get; set; }
     }
 }

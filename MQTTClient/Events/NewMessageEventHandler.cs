@@ -8,7 +8,7 @@ using MQTTClient.Mqtt;
 
 namespace IoT.Services.MqttServices.Events
 {
-    class NewMessageEventHandler : IntegrationEvent, IIntegrationEventHandler<NewMessageEvent>
+    class NewMessageEventHandler : IntegrationEventBase, IIntegrationEventHandler<NewMqttMessageEvent>
     {
         private MqttService mqttService;
 
@@ -17,7 +17,7 @@ namespace IoT.Services.MqttServices.Events
             mqttService = service;
         }
 
-        public async void Handle(NewMessageEvent @event)
+        public async void Handle(NewMqttMessageEvent @event)
         {
 
             Logger.Info($"Processing event: {@event.Message.Payload}");

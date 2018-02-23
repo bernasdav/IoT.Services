@@ -7,22 +7,72 @@ namespace IoT.Services.EventBus
 {
     public interface IEventBusSubscriptionsManager
     {
+        /// <summary>
+        /// Chekcs whether the the sibscriptions manager is empty.
+        /// </summary>
+        /// <value>
+        /// Returns <c>True</c> if empty otherwise <c>False</c>.
+        /// </value>
         bool IsEmpty { get; }
+
+        /// <summary>
+        /// Raised when an event is removed.
+        /// </summary>
         event EventHandler<string> OnEventRemoved;
-       
-        void AddSubscription<T>(Action<IntegrationEvent> action)
-           where T : IntegrationEvent;
 
+        /// <summary>
+        /// Adds a subscription. <seealso cref="IntegrationEventBase"/>
+        /// </summary>
+        /// <typeparam name="T">The integration event.</typeparam>
+        /// <param name="action">The event handler delegate.</param>
+        void AddSubscription<T>(Action<IntegrationEventBase> action)
+           where T : IntegrationEventBase;
+
+        /// <summary>
+        /// Removes a subscriptions. <seealso cref="IntegrationEventBase"/>
+        /// </summary>
+        /// <typeparam name="T">The integration event.</typeparam>
         void RemoveSubscription<T>()
-             where T : IntegrationEvent;
+             where T : IntegrationEventBase;
 
-        bool HasSubscriptionsForEvent<T>() where T : IntegrationEvent;
+        /// <summary>
+        /// Checks if there is an event handler for the given event.
+        /// </summary>
+        /// <typeparam name="T">The integration event.</typeparam>
+        /// <returns><c>True</c> if the event handler exists otherwise <c>False</c></returns>
+        bool HasSubscriptionsForEvent<T>() where T : IntegrationEventBase;
+
+        /// <summary>
+        /// Checks if there is an event handler for the given event.
+        /// </summary>
+        /// <param name="eventName">The vent name.</param>
+        /// <returns><c>True</c> if the event handler exists otherwise <c>False</c></returns>
         bool HasSubscriptionsForEvent(string eventName);
+
+        /// <summary>
+        /// Gets the event type by name.
+        /// </summary>
+        /// <param name="eventName">The name of the event.</param>
+        /// <returns>The <c>Type</c> of the event.</returns>
         Type GetEventTypeByName(string eventName);
+
+        /// <summary>
+        /// Clears the subscription manager.
+        /// </summary>
         void Clear();
-        //IEnumerable<SubscriptionInfo> GetHandlersForEvent<T>() where T : IntegrationEvent;
-        //IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName);
-        Action<IntegrationEvent> GetHandlerForEvent(string eventName);
+
+        /// <summary>
+        /// Gets the handler of an event.
+        /// </summary>
+        /// <param name="eventName">The event name.</param>
+        /// <returns>The event handler delegate.</returns>
+        Action<IntegrationEventBase> GetHandlerForEvent(string eventName);
+
+        /// <summary>
+        /// Gets the key for the event.
+        /// </summary>
+        /// <typeparam name="T">The integration event.</typeparam>
+        /// <returns>The event key.</returns>
         string GetEventKey<T>();
     }
 }

@@ -15,6 +15,9 @@ using System.Threading.Tasks;
 
 namespace IoT.Services.EventBus
 {
+    /// <summary>
+    /// The event bus. <seealso cref="IDisposable"/>
+    /// </summary>
     public class EventBusService : IEventBus, IDisposable
     {
         const string brokerName = "IotEventBus";
@@ -56,7 +59,11 @@ namespace IoT.Services.EventBus
             }
         }
 
-        public void Publish(IntegrationEvent @event)
+        /// <summary>
+        /// Publishes an event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Publish(IntegrationEventBase @event)
         {
             if (!persistentConnection.IsConnected)
             {
@@ -91,9 +98,13 @@ namespace IoT.Services.EventBus
             }
         }
 
-
-        public void Subscribe<T>(Action<IntegrationEvent> action)
-            where T : IntegrationEvent
+        /// <summary>
+        /// Subscribes an event handler for an event.
+        /// </summary>
+        /// <typeparam name="T">The event.</typeparam>
+        /// <param name="action">The event handler.</param>
+        public void Subscribe<T>(Action<IntegrationEventBase> action)
+            where T : IntegrationEventBase
         {
             var eventName = subsManager.GetEventKey<T>();
             DoInternalSubscription(eventName);
@@ -119,12 +130,21 @@ namespace IoT.Services.EventBus
             }
         }
 
+
+
+        /// <summary>
+        /// Unsubscribes an event handler for an event.
+        /// </summary>
+        /// <typeparam name="T">The event.</typeparam>
         public void Unsubscribe<T>()
-            where T : IntegrationEvent
+            where T : IntegrationEventBase
         {
             subsManager.RemoveSubscription<T>();
         }
 
+        /// <summary>
+        /// The dispose method.
+        /// </summary>
         public void Dispose()
         {
             if (consumerChannel != null)
@@ -185,7 +205,7 @@ namespace IoT.Services.EventBus
                 var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
                 await Task.Run(() =>
                 {
-                    actionDelegate?.Invoke((IntegrationEvent)integrationEvent);
+                    actionDelegate?.Invoke((IntegrationEventBase)integrationEvent);
                 });
             }
         }
