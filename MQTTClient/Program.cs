@@ -37,7 +37,7 @@ namespace MQTTClient
                 int nr = 1;
                 while (true)
                 {
-                    var msg = new IoT.Services.Contracts.Messaging.MqttMessage(1.ToString());
+                    var msg = new MqttMessage(1.ToString());
                     await client.Publish("testtopic/receive", msg);
                     Logging.Logger.Info("Sending");
                     nr++;
@@ -65,6 +65,7 @@ namespace MQTTClient
         {
             var @event = new NewMqttMessageEvent();
             @event.Message = new MqttMessage();
+            @event.Message.Payload.PayloadType = PayloadType.Value;
             @event.Message.Payload.PayloadText = "1";
             eventBus.Publish(@event);
         }

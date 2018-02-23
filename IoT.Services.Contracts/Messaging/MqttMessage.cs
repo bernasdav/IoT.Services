@@ -16,6 +16,7 @@ namespace IoT.Services.Contracts.Messaging
         public MqttMessage(string payload)
         {
             Payload = new Payload();
+            Payload.PayloadType = PayloadType.Value;
             Payload.PayloadText = payload;
         }
 
@@ -53,8 +54,8 @@ namespace IoT.Services.Contracts.Messaging
         /// </summary>
         /// <returns>The payload as a byte array.</returns>
         public byte[] PayloadByteArray()
-        {
-            return Encoding.ASCII.GetBytes(Payload.PayloadText);
+        {            
+            return Encoding.ASCII.GetBytes(SerializePayload(Payload));
         }
 
         private Payload DeserializePayload(string payload)
@@ -62,7 +63,7 @@ namespace IoT.Services.Contracts.Messaging
             return JsonConvert.DeserializeObject<Payload>(payload);
         }
 
-        private string SerializePayload(string payload)
+        private string SerializePayload(Payload payload)
         {
             return JsonConvert.SerializeObject(payload);
         }

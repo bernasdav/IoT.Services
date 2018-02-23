@@ -12,8 +12,8 @@ namespace MQTTClient.Mqtt
     {
         private MqttClient client;
 
-        private string[] topics = new string[2];
-        private byte[] qos = new byte[2];
+        private string[] topics = new string[3];
+        private byte[] qos = new byte[3];
 
         /// <summary>
         /// Creates a new instance of <see cref="MqttService"/>
@@ -24,8 +24,10 @@ namespace MQTTClient.Mqtt
             client.Connect(Guid.NewGuid().ToString(), "client", "client");
             topics[0] = "testtopic/devices";
             topics[1] = "testtopic/receive";
+            topics[2] = "testtopic/values";
             qos[0] = 1;
             qos[1] = 1;
+            qos[2] = 2;
             client.Subscribe(topics, qos);
 
             client.OnMqttMsgPublishReceived += OnMqttMsgPublishReceived;
