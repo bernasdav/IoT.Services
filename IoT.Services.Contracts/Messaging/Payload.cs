@@ -12,6 +12,12 @@ namespace IoT.Services.Contracts.Messaging
         [JsonProperty]
         public String PayloadText { get; set; }
 
+        [JsonProperty]
+        public string ValueName { get; set; }
+
+        [JsonProperty]
+        public DateTime Date => DateTime.Now;
+
         [JsonConstructor]
         public Payload()
         {

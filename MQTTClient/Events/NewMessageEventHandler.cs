@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IoT.Services.Contracts.Eventing;
 using MQTTClient.Mqtt;
+using IoT.Services.MqttServices.Eventing;
 
 namespace IoT.Services.MqttServices.Events
 {

@@ -3,7 +3,7 @@ using System;
 
 namespace IoT.Services.EventBus
 { 
-    interface IEventBus
+    public interface IEventBus
     {
         /// <summary>
         /// Publishes an event.
@@ -26,5 +26,10 @@ namespace IoT.Services.EventBus
         /// <typeparam name="T">The event.</typeparam>
         void Unsubscribe<T>()
             where T : IntegrationEventBase;
+
+        /// <summary>
+        /// The flag indicating whether the connection is established.
+        /// </summary>
+        bool IsConnected { get; }
     }
 }

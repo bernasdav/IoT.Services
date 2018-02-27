@@ -53,11 +53,11 @@ namespace IoT.Services.EventBus
             where T : IntegrationEventBase
         {
             var eventName = GetEventKey<T>();
-            DoAddSubscription(action, eventName, isDynamic: false);
+            DoAddSubscription(action, eventName);
             eventTypes.Add(typeof(T));
         }
 
-        private void DoAddSubscription(Action<IntegrationEventBase> action, string eventName, bool isDynamic)
+        private void DoAddSubscription(Action<IntegrationEventBase> action, string eventName)
         {
             if (!HasSubscriptionsForEvent(eventName))
             {

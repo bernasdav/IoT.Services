@@ -28,11 +28,13 @@ namespace IoT.Services.EventBus
         private IModel consumerChannel;
         private string queueName;
 
-        public EventBusService()
+        public bool IsConnected => persistentConnection.IsConnected;
+
+        public EventBusService(string queueName)
         {
-            persistentConnection = new DefaultRabbitMQPersistentConnection(new ConnectionFactory { HostName = "localhost" });
+            persistentConnection = new DefaultRabbitMQPersistentConnection(new ConnectionFactory { HostName = "davidber.ddns.net", UserName = "client", Password = "client" });
             subsManager = new InMemoryEventBusSubscriptionsManager();
-            queueName = brokerName;
+            this.queueName = queueName;
             consumerChannel = CreateConsumerChannel();
             retryCount = 5;
             subsManager.OnEventRemoved += SubsManagerOnEventRemoved;
@@ -70,12 +72,13 @@ namespace IoT.Services.EventBus
                 persistentConnection.TryConnect();
             }
 
-            var policy = RetryPolicy.Handle<BrokerUnreachableException>()
-                .Or<SocketException>()
-                .WaitAndRetry(retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
-                {
-                    //logger.LogWarning(ex.ToString());
-                });
+            //var policy = RetryPolicy.Handle<BrokerUnreachableException>()
+            //    .Or<SocketException>()
+            //    .WaitAndRetry(retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
+            //    {
+            //        //TODO: Implement Logger.
+            //        Console.WriteLine("Failed publishing Retrying...");
+            //    });
 
             using (var channel = persistentConnection.CreateModel())
             {
@@ -88,13 +91,10 @@ namespace IoT.Services.EventBus
                 var message = JsonConvert.SerializeObject(@event);
                 var body = Encoding.UTF8.GetBytes(message);
 
-                policy.Execute(() =>
-                {
-                    channel.BasicPublish(exchange: brokerName,
+                channel.BasicPublish(exchange: brokerName,
                                      routingKey: eventName,
                                      basicProperties: null,
                                      body: body);
-                });
             }
         }
 
@@ -180,11 +180,11 @@ namespace IoT.Services.EventBus
                 var eventName = ea.RoutingKey;
                 var message = Encoding.UTF8.GetString(ea.Body);
 
-                await ProcessEvent(eventName, message);
+                 await ProcessEvent(eventName, message);
             };
 
             channel.BasicConsume(queue: queueName,
-                                 autoAck: false,
+                                 autoAck: true,
                                  consumer: consumer);
 
             channel.CallbackException += (sender, ea) =>

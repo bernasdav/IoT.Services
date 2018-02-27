@@ -47,7 +47,7 @@ namespace IoT.Services.Contracts.Messaging
         /// <summary>
         /// The serialized Json payload.
         /// </summary>
-        public string SerializedPayload { get; set; }
+        public string SerializedPayload => SerializePayload(Payload);
 
         /// <summary>
         /// Converts the messag payload to a byte array.
