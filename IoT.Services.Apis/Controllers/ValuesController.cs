@@ -41,14 +41,7 @@ namespace IoT.Services.Apis.Controllers
         //[ProducesResponseType((int)HttpStatusCode.OK)]
         public void Post([FromBody]MessagePayloadModel value)
         {            
-            var @event = new NewMqttMessageEvent();
-            var message = new MqttMessage();
-            message.Payload.PayloadType = PayloadType.Value;
-            message.Payload.PayloadText = value.PayloadText;
-            //message.Payload.Date = DateTime.Now;
-            message.Payload.ValueName = "LED";
-            @event.Message = message;
-            eventBus.Publish(@event);
+           //TODO: new implementation of message.
         }
 
         //// PUT api/values/5

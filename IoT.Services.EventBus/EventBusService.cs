@@ -30,10 +30,10 @@ namespace IoT.Services.EventBus
 
         public bool IsConnected => persistentConnection.IsConnected;
 
-        public EventBusService(string queueName)
+        internal EventBusService(string queueName, IRabbitMQPersistentConnection connection, IEventBusSubscriptionsManager subscriptionsManager)
         {
-            persistentConnection = new DefaultRabbitMQPersistentConnection(new ConnectionFactory { HostName = "davidber.ddns.net", UserName = "client", Password = "client" });
-            subsManager = new InMemoryEventBusSubscriptionsManager();
+            persistentConnection = connection;
+            subsManager = subscriptionsManager; //new InMemoryEventBusSubscriptionsManager();
             this.queueName = queueName;
             consumerChannel = CreateConsumerChannel();
             retryCount = 5;

@@ -99,7 +99,7 @@ namespace MQTTClient.Mqtt
                               {
                                   await Task.Run(() =>
                                   {
-                                      client.Publish(topic, message.PayloadByteArray());
+                                      client.Publish(topic, message.ToByteArray());
                                   });
 
                               });

@@ -36,7 +36,7 @@ namespace MQTTClient.Mqtt
 
         private void OnMqttMsgPublishReceived(object sender, MqttMessageEventArgs e)
         {
-            Logger.Info($"New message: {e.Message.SerializedPayload}.");
+            Logger.Info($"New message: {e.Message}.");
             //todo: Notify GUI here over TCP Socket.
             OnMqttMessageReceived.Invoke(this, e);
         }

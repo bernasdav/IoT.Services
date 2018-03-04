@@ -2,7 +2,6 @@
 using IoT.Services.EventBus;
 using IoT.Services.MqttServices.Eventing;
 using IoT.Services.MqttServices.Events;
-using IoT.Services.MqttServices.TcpSocket;
 using System;
 
 namespace MQTTClient
@@ -11,7 +10,6 @@ namespace MQTTClient
     {
         private static Mqtt.MqttService client;
         private static DockerLifeTimeHandler dockerLifeTimeHandler;
-        private static NotificationSocket socket;
 
         static void Main(string[] args)
         {
@@ -38,7 +36,6 @@ namespace MQTTClient
         private static void DockerLifeTimeHandler_Starting(object sender, EventArgs e)
         {
             client = new Mqtt.MqttService();
-            socket = new NotificationSocket();
             client.OnMqttMessageReceived += OnClientOnMqttMessageReceived;
             ConfigureServices();
             //SimulateSend();
@@ -46,31 +43,27 @@ namespace MQTTClient
 
         private static void SimulateSend()
         {
-            var msg = new IoT.Services.Contracts.Messaging.MqttMessage();
-            msg.Payload.PayloadText = "TEst";
-            msg.Payload.PayloadType = IoT.Services.Contracts.Messaging.PayloadType.Hello;
-            msg.Payload.ValueName = "Key";
+            var msg = new IoT.Services.Contracts.Messaging.MqttMessage("");          
 
             OnClientOnMqttMessageReceived(null, new Mqtt.MqttMessageEventArgs { Message = msg });
         }
 
         private static void OnClientOnMqttMessageReceived(object sender, Mqtt.MqttMessageEventArgs e)
         {
-            socket.SendData(e.Message.SerializedPayload);
+            //TODO: Send through event bus (to SignalR)
         }
 
         private static void ConfigureServices()
         {
             try
             {
-                var eventBus = new EventBusService("MQTTService");
+                var eventBus = EventBusFactory.GetEventBus();
                 Action<IntegrationEventBase> eventHandlerDelegate = (@event) =>
                 {
                     var handler = new NewMessageEventHandler(client);
                     handler.Handle((NewMqttMessageEvent)@event);
                 };
                 eventBus.Subscribe<NewMqttMessageEvent>(eventHandlerDelegate);
-                SignalRService signalRService = new SignalRService();
             }
             catch (Exception ex)
             {

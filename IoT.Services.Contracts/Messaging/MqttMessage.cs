@@ -14,15 +14,13 @@ namespace IoT.Services.Contracts.Messaging
         /// </summary>
         /// <param name="payload">the message of the payload.</param>
         public MqttMessage(string payload)
-        {
-            Payload = new Payload();
-            Payload.PayloadType = PayloadType.Value;
-            Payload.PayloadText = payload;
+        {           
         }
 
-        public MqttMessage()
+        [JsonConstructor]
+        private MqttMessage()
         {
-            Payload = new Payload();
+
         }
 
         /// <summary>
@@ -36,36 +34,59 @@ namespace IoT.Services.Contracts.Messaging
             {
                 sb.Append((char)c);
             }
-            Payload = DeserializePayload(sb.ToString());
         }
 
         /// <summary>
-        /// The message payload.
+        /// Gets or sets the message type. <seealso cref="MessageType"/>
         /// </summary>
-        public Payload Payload { get; set; }
+        [JsonProperty]
+        public MessageType MessageType { get; set; }
 
         /// <summary>
-        /// The serialized Json payload.
+        /// Gets or sets the key.
         /// </summary>
-        public string SerializedPayload => SerializePayload(Payload);
+        [JsonProperty]
+        public string Key { get; set; }
 
         /// <summary>
-        /// Converts the messag payload to a byte array.
+        /// Gets or sets the message value.
+        /// </summary>
+        [JsonProperty]
+        public object Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp of the message.
+        /// </summary>
+        [JsonProperty]
+        public DateTime Timestamp { get; set; }
+
+
+        /// <summary>
+        /// Converts the message to a byte array.
         /// </summary>
         /// <returns>The payload as a byte array.</returns>
-        public byte[] PayloadByteArray()
-        {            
-            return Encoding.ASCII.GetBytes(SerializePayload(Payload));
+        public byte[] ToByteArray()
+        {
+            return Encoding.ASCII.GetBytes(this.Serialize());
         }
 
-        private Payload DeserializePayload(string payload)
+        /// <summary>
+        /// Deserializes a message.
+        /// </summary>
+        /// <param name="payload">The message payload.</param>
+        /// <returns>a new instace of <see cref="MqttMessage"/></returns>
+        public static MqttMessage Deserialize(string payload)
         {
-            return JsonConvert.DeserializeObject<Payload>(payload);
+            return JsonConvert.DeserializeObject<MqttMessage>(payload);
         }
 
-        private string SerializePayload(Payload payload)
+        /// <summary>
+        /// Serializes the current message to a Json string
+        /// </summary>
+        /// <returns>The message as Json string.</returns>
+        public string Serialize()
         {
-            return JsonConvert.SerializeObject(payload);
+            return JsonConvert.SerializeObject(this);
         }
     }
 }

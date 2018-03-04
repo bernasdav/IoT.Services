@@ -23,7 +23,7 @@ namespace IoT.Services.Apis
         {
             // Add framework services.
             services.AddMvc().AddControllersAsServices();
-            services.AddSingleton<IEventBus, EventBusService>(sp => { return new EventBusService("API"); });
+            services.AddSingleton<IEventBus, EventBusService>(sp => { return EventBusFactory.GetEventBus(); });
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
                 builder.AllowAnyOrigin()

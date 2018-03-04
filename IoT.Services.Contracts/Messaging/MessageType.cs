@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IoT.Services.Contracts.Messaging
 {
-    public enum PayloadType
+    public enum MessageType
     {
         Hello,
         Value,

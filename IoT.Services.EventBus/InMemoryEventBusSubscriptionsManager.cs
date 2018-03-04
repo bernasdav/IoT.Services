@@ -10,7 +10,7 @@ namespace IoT.Services.EventBus
     /// <summary>
     /// Manages the subscriptions for the event bus.
     /// </summary>
-    public class InMemoryEventBusSubscriptionsManager : IEventBusSubscriptionsManager
+    internal class InMemoryEventBusSubscriptionsManager : IEventBusSubscriptionsManager
     {
 
 
