@@ -41,7 +41,7 @@ namespace MQTTClient
             socket = new NotificationSocket();
             client.OnMqttMessageReceived += OnClientOnMqttMessageReceived;
             ConfigureServices();
-            SimulateSend();
+            //SimulateSend();
         }
 
         private static void SimulateSend()
@@ -70,6 +70,7 @@ namespace MQTTClient
                     handler.Handle((NewMqttMessageEvent)@event);
                 };
                 eventBus.Subscribe<NewMqttMessageEvent>(eventHandlerDelegate);
+                SignalRService signalRService = new SignalRService();
             }
             catch (Exception ex)
             {

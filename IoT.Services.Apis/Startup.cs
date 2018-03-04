@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using IoT.Services.EventBus;
-using IoT.Services.EventBus.RabbitMQ;
+using IoT.Services.Api.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 
 namespace IoT.Services.Apis
 {
@@ -28,6 +24,17 @@ namespace IoT.Services.Apis
             // Add framework services.
             services.AddMvc().AddControllersAsServices();
             services.AddSingleton<IEventBus, EventBusService>(sp => { return new EventBusService("API"); });
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+            services.Configure<MvcOptions>(options =>
+            {
+                options.Filters.Add(new CorsAuthorizationFilterFactory("MyPolicy"));
+            });
+            services.AddSignalR();
         }
 
         private void ConfigureEventBus(IApplicationBuilder app)
@@ -43,8 +50,18 @@ namespace IoT.Services.Apis
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseCors("MyPolicy");
+            //app.UseCors(builder =>
+            //            builder.WithOrigins("http://localhost")
+            //            .AllowAnyHeader()
+            //            );
 
+            
             app.UseMvc();
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<SignalRService>("NotifierHub");
+            });
         }
     }
 }
