@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace IoT.Services.Apis
+namespace IoT.Services.SignalRWebService
 {
     public class Program
     {

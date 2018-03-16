@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using IoT.Services.Contracts.Messaging;
 
-namespace MQTTClient.Mqtt
+namespace IoT.Services.MqttServices.Mqtt
 {
     /// <summary>
     /// A facade for an Mqtt client.
     /// </summary>
-    internal interface IMqttClient
+    public interface IMqttClient
     {
         /// <summary>
         /// Raised when a message is received.
@@ -41,7 +41,7 @@ namespace MQTTClient.Mqtt
         /// <param name="topic">The topic.</param>
         /// <param name="message">The message payload.</param>
         /// <returns></returns>
-        Task Publish(string topic, MqttMessage message);
+        Task Publish(string topic, MqttMessagePayload message);
 
         /// <summary>
         /// Disconnects the client.

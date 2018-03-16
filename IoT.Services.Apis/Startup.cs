@@ -6,8 +6,12 @@ using IoT.Services.EventBus;
 using IoT.Services.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Cors.Internal;
+using IoT.Services.Contracts.Eventing;
+using IoT.Services.Contracts.Messaging;
+using IoT.Services.SignalRWebService.Eventing;
+using Microsoft.AspNetCore.SignalR;
 
-namespace IoT.Services.Apis
+namespace IoT.Services.SignalRWebService
 {
     public class Startup
     {
@@ -34,13 +38,7 @@ namespace IoT.Services.Apis
             {
                 options.Filters.Add(new CorsAuthorizationFilterFactory("MyPolicy"));
             });
-            services.AddSignalR();
-        }
-
-        private void ConfigureEventBus(IApplicationBuilder app)
-        {
-            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
-            //Todo: subscribe to events here.
+            services.AddSignalR();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,17 +49,17 @@ namespace IoT.Services.Apis
                 app.UseDeveloperExceptionPage();
             }
             app.UseCors("MyPolicy");
-            //app.UseCors(builder =>
-            //            builder.WithOrigins("http://localhost")
-            //            .AllowAnyHeader()
-            //            );
-
-            
             app.UseMvc();
             app.UseSignalR(routes =>
             {
                 routes.MapHub<SignalRService>("NotifierHub");
             });
+
+            var hub = app.ApplicationServices.GetRequiredService<IHubContext<SignalRService>>();
+            //var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();            
+            //var eventHandler = new MessageReceivedHandler();
+
+
         }
     }
 }

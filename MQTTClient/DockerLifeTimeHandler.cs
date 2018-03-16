@@ -1,4 +1,4 @@
-﻿using MQTTClient.Logging;
+﻿using IoT.Services.MqttServices.Logging;
 using System;
 using System.Runtime.Loader;
 using System.Threading;

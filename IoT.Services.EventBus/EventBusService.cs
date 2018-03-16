@@ -24,16 +24,16 @@ namespace IoT.Services.EventBus
 
         private readonly IRabbitMQPersistentConnection persistentConnection;
         private readonly IEventBusSubscriptionsManager subsManager;
-        private readonly int retryCount;
         private IModel consumerChannel;
         private string queueName;
+        private int retryCount;
 
         public bool IsConnected => persistentConnection.IsConnected;
 
         internal EventBusService(string queueName, IRabbitMQPersistentConnection connection, IEventBusSubscriptionsManager subscriptionsManager)
         {
             persistentConnection = connection;
-            subsManager = subscriptionsManager; //new InMemoryEventBusSubscriptionsManager();
+            subsManager = subscriptionsManager;
             this.queueName = queueName;
             consumerChannel = CreateConsumerChannel();
             retryCount = 5;
@@ -103,12 +103,12 @@ namespace IoT.Services.EventBus
         /// </summary>
         /// <typeparam name="T">The event.</typeparam>
         /// <param name="action">The event handler.</param>
-        public void Subscribe<T>(Action<IntegrationEventBase> action)
+        public void Subscribe<T>(IIntegrationEventHandler eventHandler)
             where T : IntegrationEventBase
         {
             var eventName = subsManager.GetEventKey<T>();
             DoInternalSubscription(eventName);
-            subsManager.AddSubscription<T>(action);
+            subsManager.AddSubscription<T>(eventHandler);
         }
 
         private void DoInternalSubscription(string eventName)
@@ -200,12 +200,14 @@ namespace IoT.Services.EventBus
         {
             if (subsManager.HasSubscriptionsForEvent(eventName))
             {
-                var actionDelegate = subsManager.GetHandlerForEvent(eventName);
+                var eventHandler = subsManager.GetHandlerForEvent(eventName);
                 var eventType = subsManager.GetEventTypeByName(eventName);
                 var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
                 await Task.Run(() =>
                 {
-                    actionDelegate?.Invoke((IntegrationEventBase)integrationEvent);
+                    //eventHandler?.Invoke((IntegrationEventBase)integrationEvent);
+                    var handler = eventHandler as IIntegrationEventHandler<IntegrationEventBase>;
+                    handler.Handle((IntegrationEventBase)integrationEvent);
                 });
             }
         }

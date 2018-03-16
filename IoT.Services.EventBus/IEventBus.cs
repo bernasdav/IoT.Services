@@ -16,7 +16,7 @@ namespace IoT.Services.EventBus
         /// </summary>
         /// <typeparam name="T">The event.</typeparam>
         /// <param name="action">The event handler.</param>
-        void Subscribe<T>(Action<IntegrationEventBase> action)
+        void Subscribe<T>(IIntegrationEventHandler eventHandler)
             where T : IntegrationEventBase;
 
 

@@ -6,8 +6,8 @@ namespace IoT.Services.Contracts.Messaging
 {
     public enum MessageType
     {
-        Hello,
-        Value,
+        DeviceInfo,
+        DeviceValues,
         Unknown
     }
 }

@@ -7,7 +7,6 @@ using IoT.Services.EventBus;
 using IoT.Services.Contracts.Eventing;
 using IoT.Services.Contracts.Messaging;
 using System.Net;
-using IoT.Services.MqttServices.Eventing;
 using IoT.Services.Apis.Models;
 
 namespace IoT.Services.Apis.Controllers

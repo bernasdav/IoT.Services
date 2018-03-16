@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using M2MNetworking = uPLibrary.Networking.M2Mqtt;
-using M2MMessaging = uPLibrary.Networking.M2Mqtt.Messages;
-using MQTTClient.Logging;
+﻿using IoT.Services.MqttServices.Logging;
 using IoT.Services.Contracts.Messaging;
 using Polly;
-using Polly.Retry;
-using uPLibrary.Networking.M2Mqtt.Exceptions;
+using System;
+using System.Threading.Tasks;
+using M2MMessaging = uPLibrary.Networking.M2Mqtt.Messages;
+using M2MNetworking = uPLibrary.Networking.M2Mqtt;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
-namespace MQTTClient.Mqtt
+namespace IoT.Services.MqttServices.Mqtt
 {
     /// <summary>
     /// A facade for an Mqtt client.
     /// </summary>
-    internal class MqttClient : IMqttClient
+    public class MqttClient : IMqttClient
     {
         private M2MNetworking.MqttClient client;
 
@@ -39,7 +37,8 @@ namespace MQTTClient.Mqtt
             try
             {
                 if (OnMqttMsgPublishReceived == null) return;
-                var msg = new MqttMessage(e.Message);
+                var msgString = System.Text.Encoding.Default.GetString(e.Message);
+                var msg = JsonConvert.DeserializeObject<MqttMessage>(msgString);
                 OnMqttMsgPublishReceived.Invoke(sender, new MqttMessageEventArgs { Message = msg });
             }
             catch (Exception ex)
@@ -88,7 +87,7 @@ namespace MQTTClient.Mqtt
         /// <param name="topic">The topic.</param>
         /// <param name="message">The message payload.</param>
         /// <returns></returns>
-        public async Task Publish(string topic, MqttMessage message)
+        public async Task Publish(string topic, MqttMessagePayload message)
         {
             await Policy.Handle<Exception>()
                  .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (exception, timeSpan, context) =>
@@ -125,7 +124,7 @@ namespace MQTTClient.Mqtt
         }
     }
 
-    internal class MqttMessageEventArgs : EventArgs
+    public class MqttMessageEventArgs : EventArgs
     {
         public MqttMessage Message { get; set; }
     }

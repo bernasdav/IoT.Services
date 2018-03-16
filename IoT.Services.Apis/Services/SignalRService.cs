@@ -9,26 +9,26 @@ namespace IoT.Services.Api.Services
 {
 
     class SignalRService : Hub
-    {
+    {       
+
         public SignalRService()
-        {
-            
+        {            
         }
 
         public override Task OnConnectedAsync()
         {
-            Send();
             return base.OnConnectedAsync();
         }
+
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
             return base.OnDisconnectedAsync(exception);
         }
 
-        public void Send()
+        public void Send(string data)
         {
-            Clients.All.InvokeAsync("data", "Hello");
+            Clients.All.InvokeAsync(data, "Hello");
         }
     }
 }

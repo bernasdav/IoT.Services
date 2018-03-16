@@ -1,13 +1,12 @@
-﻿using MQTTClient.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using IoT.Services.Contracts.Eventing;
-using MQTTClient.Mqtt;
-using IoT.Services.MqttServices.Eventing;
+using IoT.Services.MqttServices.Mqtt;
+using IoT.Services.MqttServices.Logging;
 
-namespace IoT.Services.MqttServices.Events
+namespace IoT.Services.MqttServices.Eventing
 {
     /// <summary>
     /// The evet handler for a message directed to a device.
@@ -24,8 +23,8 @@ namespace IoT.Services.MqttServices.Events
         public async void Handle(NewMqttMessageEvent @event)
         {
 
-            Logger.Info($"Processing event: {@event.Message.Serialize()}");
-            await mqttService.Publish("testtopic/receive", @event.Message);
+            //Logger.Info($"Processing event: {@event.Message.Serialize()}");
+            //await mqttService.Publish("testtopic/receive", @event.Message);
         }
     }
 }

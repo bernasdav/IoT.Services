@@ -14,7 +14,7 @@ namespace IoT.Services.EventBus
         public static EventBusService GetEventBus()
         {
             var subscriptionManager = new InMemoryEventBusSubscriptionsManager();
-            var rabbitMQConnection = new DefaultRabbitMQPersistentConnection(new ConnectionFactory { HostName = "davidber.ddns.net", UserName = "client", Password = "client" });
+            var rabbitMQConnection = new DefaultRabbitMQPersistentConnection(new ConnectionFactory { HostName = "localhost" /*HostName = "davidber.ddns.net"*/, UserName = "client", Password = "client" });
             return new EventBusService(new Guid().ToString(), rabbitMQConnection, subscriptionManager);
         }
     }

@@ -14,7 +14,7 @@ namespace IoT.Services.EventBus
     {
 
 
-        private readonly Dictionary<string, Action<IntegrationEventBase>> handlers;
+        private readonly Dictionary<string, IIntegrationEventHandler> handlers;
         private readonly List<Type> eventTypes;
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace IoT.Services.EventBus
         /// </summary>
         public InMemoryEventBusSubscriptionsManager()
         {
-            handlers = new Dictionary<string, Action<IntegrationEventBase>>();
+            handlers = new Dictionary<string, IIntegrationEventHandler>();
             eventTypes = new List<Type>();
         }
 
@@ -49,19 +49,19 @@ namespace IoT.Services.EventBus
         /// </summary>
         /// <typeparam name="T">The integration event.</typeparam>
         /// <param name="action">The event handler delegate.</param>
-        public void AddSubscription<T>(Action<IntegrationEventBase> action)
+        public void AddSubscription<T>(IIntegrationEventHandler eventHandler)
             where T : IntegrationEventBase
         {
             var eventName = GetEventKey<T>();
-            DoAddSubscription(action, eventName);
+            DoAddSubscription(eventHandler, eventName);
             eventTypes.Add(typeof(T));
         }
 
-        private void DoAddSubscription(Action<IntegrationEventBase> action, string eventName)
+        private void DoAddSubscription(IIntegrationEventHandler eventHandler, string eventName)
         {
             if (!HasSubscriptionsForEvent(eventName))
             {
-                handlers.Add(eventName, action);
+                handlers.Add(eventName, eventHandler);
             }           
         }
 
@@ -125,7 +125,7 @@ namespace IoT.Services.EventBus
         /// </summary>
         /// <param name="eventName">The event name.</param>
         /// <returns>The event handler delegate.</returns>
-        public Action<IntegrationEventBase> GetHandlerForEvent(string eventName)
+        public IIntegrationEventHandler GetHandlerForEvent(string eventName)
         {
             return handlers[eventName];
         }

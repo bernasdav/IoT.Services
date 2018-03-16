@@ -1,15 +1,17 @@
-﻿using IoT.Services.Contracts.Eventing;
+﻿using IoT.Services.MqttServices.Logging;
+using IoT.Services.Contracts.Eventing;
 using IoT.Services.EventBus;
 using IoT.Services.MqttServices.Eventing;
-using IoT.Services.MqttServices.Events;
+using IoT.Services.MqttServices.Mqtt;
 using System;
 
 namespace MQTTClient
 {
     class Program
     {
-        private static Mqtt.MqttService client;
+        private static MqttService mqttService;
         private static DockerLifeTimeHandler dockerLifeTimeHandler;
+        private static EventBusService eventBus;
 
         static void Main(string[] args)
         {
@@ -23,53 +25,37 @@ namespace MQTTClient
             }
             catch (Exception ex)
             {
-
-                Logging.Logger.Error(ex.Message);
+                Logger.Error(ex.Message);
             }
         }
 
         private static void DockerLifeTimeHandler_Stopping(object sender, EventArgs e)
         {
-            client.StopService();
+            mqttService.StopService();
         }
 
         private static void DockerLifeTimeHandler_Starting(object sender, EventArgs e)
         {
-            client = new Mqtt.MqttService();
-            client.OnMqttMessageReceived += OnClientOnMqttMessageReceived;
+            var client = new MqttClient("localhost"); //new MqttClient("davidber.ddns.net");
+            mqttService = new MqttService(client);
+            mqttService.OnMqttMessageReceived += OnClientOnMqttMessageReceived;
             ConfigureServices();
-            //SimulateSend();
-        }
 
-        private static void SimulateSend()
+            mqttService.SimulateReceive();
+        }        
+
+        private static void OnClientOnMqttMessageReceived(object sender, MqttMessageEventArgs e)
         {
-            var msg = new IoT.Services.Contracts.Messaging.MqttMessage("");          
-
-            OnClientOnMqttMessageReceived(null, new Mqtt.MqttMessageEventArgs { Message = msg });
-        }
-
-        private static void OnClientOnMqttMessageReceived(object sender, Mqtt.MqttMessageEventArgs e)
-        {
+            var @event = new NewMqttMessageEvent(e.Message);
+            eventBus.Publish(@event);
             //TODO: Send through event bus (to SignalR)
+            //TODO: Handle HEllo message, subscribe to new topics etc...
         }
 
         private static void ConfigureServices()
         {
-            try
-            {
-                var eventBus = EventBusFactory.GetEventBus();
-                Action<IntegrationEventBase> eventHandlerDelegate = (@event) =>
-                {
-                    var handler = new NewMessageEventHandler(client);
-                    handler.Handle((NewMqttMessageEvent)@event);
-                };
-                eventBus.Subscribe<NewMqttMessageEvent>(eventHandlerDelegate);
-            }
-            catch (Exception ex)
-            {
-                Logging.Logger.Error($"Error connecting to Event Bus: {ex.Message}");
-            }
-        }
+            eventBus = EventBusFactory.GetEventBus();            
+        }           
 
     }
 }

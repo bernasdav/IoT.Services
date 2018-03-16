@@ -25,7 +25,7 @@ namespace IoT.Services.EventBus
         /// </summary>
         /// <typeparam name="T">The integration event.</typeparam>
         /// <param name="action">The event handler delegate.</param>
-        void AddSubscription<T>(Action<IntegrationEventBase> action)
+        void AddSubscription<T>(IIntegrationEventHandler eventHandler)
            where T : IntegrationEventBase;
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace IoT.Services.EventBus
         /// </summary>
         /// <param name="eventName">The event name.</param>
         /// <returns>The event handler delegate.</returns>
-        Action<IntegrationEventBase> GetHandlerForEvent(string eventName);
+        IIntegrationEventHandler GetHandlerForEvent(string eventName);
 
         /// <summary>
         /// Gets the key for the event.

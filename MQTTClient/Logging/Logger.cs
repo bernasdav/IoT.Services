@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MQTTClient.Logging
+namespace IoT.Services.MqttServices.Logging
 {
     /// <summary>
     /// A class representing a Logger.
