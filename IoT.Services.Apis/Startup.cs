@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using IoT.Services.EventBus;
-using IoT.Services.Api.Services;
+using IoT.Services.Api.Channels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using IoT.Services.Contracts.Eventing;
@@ -38,7 +38,7 @@ namespace IoT.Services.SignalRWebService
             {
                 options.Filters.Add(new CorsAuthorizationFilterFactory("MyPolicy"));
             });
-            services.AddSignalR();            
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,14 +52,19 @@ namespace IoT.Services.SignalRWebService
             app.UseMvc();
             app.UseSignalR(routes =>
             {
-                routes.MapHub<SignalRService>("NotifierHub");
+                routes.MapHub<SignalRHub>("NotifierHub");
             });
 
-            var hub = app.ApplicationServices.GetRequiredService<IHubContext<SignalRService>>();
-            //var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();            
-            //var eventHandler = new MessageReceivedHandler();
+            ConfigureEventBus(app);
+        }
 
+        private void ConfigureEventBus(IApplicationBuilder app)
+        {
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+            var hub = app.ApplicationServices.GetService<IHubContext<SignalRHub>>();
+            var handler = new MessageReceivedHandler(hub);
 
+            eventBus.Subscribe<NewMqttMessageEvent>(handler);
         }
     }
 }

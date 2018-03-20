@@ -8,6 +8,8 @@ using IoT.Services.Contracts.Eventing;
 using IoT.Services.Contracts.Messaging;
 using System.Net;
 using IoT.Services.Apis.Models;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Features;
 
 namespace IoT.Services.Apis.Controllers
 {
@@ -19,6 +21,7 @@ namespace IoT.Services.Apis.Controllers
         public ValuesController(IEventBus eventBus)
         {
             this.eventBus = eventBus;
+
         }
 
         // GET api/values

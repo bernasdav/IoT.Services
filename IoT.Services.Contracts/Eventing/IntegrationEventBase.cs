@@ -5,7 +5,7 @@ namespace IoT.Services.Contracts.Eventing
     /// <summary>
     /// The base class for the integration event.
     /// </summary>
-    public abstract class IntegrationEventBase
+    public abstract class IntegrationEventBase : IIntegrationEvent
     {
         /// <summary>
         /// Creates a new instance of <see cref="IntegrationEventBase"/>

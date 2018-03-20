@@ -9,9 +9,9 @@ namespace IoT.Services.Contracts.Eventing
     /// <summary>
     /// An event raised when a new mqtt message is received.
     /// </summary>
-    public class NewMqttMessageEvent : IntegrationEventBase
+    public class NewMqttMessageEvent : IntegrationEventBase,  IIntegrationEvent
     {
-        public NewMqttMessageEvent(MqttMessage message):base()
+        public NewMqttMessageEvent(MqttMessage message)
         {
             Message = message;
         }

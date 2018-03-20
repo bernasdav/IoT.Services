@@ -4,6 +4,7 @@ using IoT.Services.Contracts.Messaging;
 using IoT.Services.MqttServices.Eventing;
 using IoT.Services.MqttServices.Logging;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace IoT.Services.MqttServices.Mqtt
 {
@@ -71,18 +72,27 @@ namespace IoT.Services.MqttServices.Mqtt
 
         public void SimulateReceive()
         {
-            var eventArgs = new MqttMessageEventArgs
+
+            Task.Run(() =>
             {
-                Message = new MqttMessage
+                while (true)
                 {
-                    Messages = new List<MqttMessagePayload>
+                    var eventArgs = new MqttMessageEventArgs
+                    {
+                        Message = new MqttMessage
+                        {
+                            Messages = new List<MqttMessagePayload>
                    {
                        new MqttMessagePayload { Key = "Key", Value = "Value", MessageType = MessageType.DeviceValues, Timestamp = DateTime.Now },
                        new MqttMessagePayload { Key = "Key-1", Value = "Value-1", MessageType = MessageType.DeviceValues, Timestamp = DateTime.Now }
                    }
+                        }
+                    };
+                    OnMqttMsgPublishReceived(this, eventArgs);
+
+                    Thread.Sleep(4000);
                 }
-            };
-            OnMqttMsgPublishReceived(this, eventArgs);
+            });
         }
     }
 }

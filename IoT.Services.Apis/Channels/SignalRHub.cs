@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using System.Net.WebSockets;
 using Microsoft.AspNetCore.SignalR;
 
-namespace IoT.Services.Api.Services
+namespace IoT.Services.Api.Channels
 {
 
-    class SignalRService : Hub
-    {       
+    class SignalRHub : Hub
+    {
 
-        public SignalRService()
-        {            
+        public SignalRHub()
+        {
         }
 
         public override Task OnConnectedAsync()
@@ -28,7 +28,7 @@ namespace IoT.Services.Api.Services
 
         public void Send(string data)
         {
-            Clients.All.InvokeAsync(data, "Hello");
+            Clients.All.InvokeAsync("Hello", data);
         }
     }
 }

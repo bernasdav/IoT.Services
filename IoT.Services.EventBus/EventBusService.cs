@@ -200,7 +200,7 @@ namespace IoT.Services.EventBus
         {
             if (subsManager.HasSubscriptionsForEvent(eventName))
             {
-                var eventHandler = subsManager.GetHandlerForEvent(eventName);
+                IIntegrationEventHandler eventHandler = subsManager.GetHandlerForEvent(eventName);
                 var eventType = subsManager.GetEventTypeByName(eventName);
                 var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
                 await Task.Run(() =>
