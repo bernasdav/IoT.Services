@@ -54,7 +54,7 @@ namespace IoT.Services.EventBus.RabbitMQ
             {
                 connection.Dispose();
             }
-            catch (IOException ex)
+            catch (IOException)
             {
                 //_logger.LogCritical(ex.ToString());
                 //TODO: Implement logging.

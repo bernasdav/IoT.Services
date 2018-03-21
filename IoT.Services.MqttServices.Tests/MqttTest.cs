@@ -4,6 +4,8 @@ using IoT.Services.Contracts.Messaging;
 using Moq;
 using System;
 using System.Collections.Generic;
+using IoT.Services.EventBus;
+using IoT.Services.Contracts.Eventing;
 
 namespace IoT.Services.MqttServices.Tests
 {
@@ -14,31 +16,26 @@ namespace IoT.Services.MqttServices.Tests
         public void MessageReceiveSucceed()
         {
             var clientMock = new Mock<IMqttClient>();
-            var service = new MqttService(clientMock.Object);
+            var eventBusMock = new Mock<IEventBus>();
+            var eventMock = new Mock<IIntegrationEvent>();
+            var service = new MqttService(clientMock.Object, eventBusMock.Object);
             Dictionary<string, object> values = new Dictionary<string, object>();
 
-            service.OnMqttMessageReceived += (e, a) => 
+            clientMock.Raise(m => m.OnMqttMsgPublishReceived += null, new MqttMessageEventArgs
             {
-                foreach (var payload in a.Message.Messages)
+                Message = new MqttMessage
                 {
-                    values.Add(payload.Key, payload.Value);
-                }
-            };
-
-           clientMock.Raise(m => m.OnMqttMsgPublishReceived += null, new MqttMessageEventArgs
-           {
-               Message = new MqttMessage
-               {
-                   Messages = new List<MqttMessagePayload>
+                    Messages = new List<MqttMessagePayload>
                    {
-                       new MqttMessagePayload { Key = "Key", Value = "Value", MessageType = MessageType.DeviceValues, Timestamp = DateTime.Now }
+                       new MqttMessagePayload { Key = "Key", Value = "Value", MessageType = MessageType.DeviceInfo, Timestamp = DateTime.Now },
+                       new MqttMessagePayload { Key = "Key", Value = "Value", MessageType = MessageType.DeviceInfo, Timestamp = DateTime.Now }
                    }
-               }
-           });
+                }
+            });
+            string[] topics = new string[1] { "Value" };
+            byte[] qoss = new byte[1] { 1 };
 
-            Assert.IsTrue(values.ContainsKey("Key"));
-            Assert.IsTrue(values.ContainsValue("Value"));
-
-        }      
+            clientMock.Verify(m => m.Subscribe(topics, qoss), Times.Exactly(2));
+        }
     }
 }

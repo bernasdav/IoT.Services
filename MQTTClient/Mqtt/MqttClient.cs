@@ -39,7 +39,7 @@ namespace IoT.Services.MqttServices.Mqtt
                 if (OnMqttMsgPublishReceived == null) return;
                 var msgString = System.Text.Encoding.Default.GetString(e.Message);
                 var msg = JsonConvert.DeserializeObject<MqttMessage>(msgString);
-                OnMqttMsgPublishReceived.Invoke(sender, new MqttMessageEventArgs { Message = msg });
+                OnMqttMsgPublishReceived?.Invoke(sender, new MqttMessageEventArgs { Message = msg });
             }
             catch (Exception ex)
             {

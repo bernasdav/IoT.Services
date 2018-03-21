@@ -9,7 +9,7 @@ namespace IoT.Services.Contracts.Eventing
     /// <summary>
     /// An event raised when a new mqtt message is received.
     /// </summary>
-    public class NewMqttMessageEvent : IntegrationEventBase,  IIntegrationEvent
+    public class NewMqttMessageEvent : IIntegrationEvent
     {
         public NewMqttMessageEvent(MqttMessage message)
         {
@@ -20,5 +20,9 @@ namespace IoT.Services.Contracts.Eventing
         /// The <see cref="MqttMessage"/>
         /// </summary>
         public MqttMessage Message { get; private set; }
+
+        public Guid Id => new Guid();
+
+        public DateTime CreationDate => DateTime.Now;
     }
 }

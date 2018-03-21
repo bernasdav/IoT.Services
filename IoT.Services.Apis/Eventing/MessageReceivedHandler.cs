@@ -8,7 +8,7 @@ namespace IoT.Services.SignalRWebService.Eventing
     /// <summary>
     /// Handles the event when a new mesage is received from a device.
     /// </summary>
-    internal class MessageReceivedHandler :  IIntegrationEventHandler<NewMqttMessageEvent>
+    internal class MessageReceivedHandler :  IIntegrationEventHandler
     {
         IHubContext<SignalRHub> hubContext;
 
@@ -17,9 +17,9 @@ namespace IoT.Services.SignalRWebService.Eventing
             this.hubContext = hubContext;
         }
       
-        public void Handle(NewMqttMessageEvent @event)
+        public void Handle(IIntegrationEvent @event)
         {
-            hubContext.Clients.All.InvokeAsync("newMessage", @event.Message);
+            hubContext.Clients.All.InvokeAsync("newMessage", ((NewMqttMessageEvent)@event).Message);
         }
     }
 }

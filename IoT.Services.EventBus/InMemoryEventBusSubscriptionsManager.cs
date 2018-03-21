@@ -17,10 +17,12 @@ namespace IoT.Services.EventBus
         private readonly Dictionary<string, IIntegrationEventHandler> handlers;
         private readonly List<Type> eventTypes;
 
+#pragma warning disable CS0067 //not yet needed
         /// <summary>
         /// Raised when an event is removed.
         /// </summary>
         public event EventHandler<string> OnEventRemoved;
+#pragma warning restore CS0067
 
         /// <summary>
         /// Creates a new instance of <see cref="InMemoryEventBusSubscriptionsManager"/>
@@ -50,7 +52,7 @@ namespace IoT.Services.EventBus
         /// <typeparam name="T">The integration event.</typeparam>
         /// <param name="action">The event handler delegate.</param>
         public void AddSubscription<T>(IIntegrationEventHandler eventHandler)
-            where T : IntegrationEventBase
+            where T : IIntegrationEvent
         {
             var eventName = GetEventKey<T>();
             DoAddSubscription(eventHandler, eventName);
@@ -70,7 +72,7 @@ namespace IoT.Services.EventBus
         /// </summary>
         /// <typeparam name="T">The integration event.</typeparam>
         public void RemoveSubscription<T>()
-            where T : IntegrationEventBase
+            where T : IIntegrationEvent
         {
             var eventName = GetEventKey<T>();
             DoRemoveHandler(eventName);
@@ -90,7 +92,7 @@ namespace IoT.Services.EventBus
         /// </summary>
         /// <typeparam name="T">The integration event.</typeparam>
         /// <returns><c>True</c> if the event handler exists otherwise <c>False</c></returns>
-        public bool HasSubscriptionsForEvent<T>() where T : IntegrationEventBase
+        public bool HasSubscriptionsForEvent<T>() where T : IIntegrationEvent
         {
             var key = GetEventKey<T>();
             return HasSubscriptionsForEvent(key);

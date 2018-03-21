@@ -28,6 +28,7 @@ namespace IoT.Services.Contracts.Messaging
             Key = message.Key;
             Value = message.Value;
             Timestamp = message.Timestamp;
+            DeviceId = message.DeviceId;
         }
 
 
@@ -67,6 +68,9 @@ namespace IoT.Services.Contracts.Messaging
         /// </summary>
         [JsonProperty]
         public DateTime Timestamp { get; set; }
+
+        [JsonProperty]
+        public string DeviceId { get; set; }
 
 
         /// <summary>

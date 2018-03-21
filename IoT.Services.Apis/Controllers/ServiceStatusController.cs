@@ -10,6 +10,7 @@ using System.Net;
 using IoT.Services.Apis.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Features;
+using IoT.Services.Api.Channels;
 
 namespace IoT.Services.Apis.Controllers
 {
@@ -21,7 +22,6 @@ namespace IoT.Services.Apis.Controllers
         public ValuesController(IEventBus eventBus)
         {
             this.eventBus = eventBus;
-
         }
 
         // GET api/values

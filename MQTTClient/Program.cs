@@ -11,8 +11,6 @@ namespace MQTTClient
     {
         private static MqttService mqttService;
         private static DockerLifeTimeHandler dockerLifeTimeHandler;
-        private static EventBusService eventBus;
-
         static void Main(string[] args)
         {
             try
@@ -37,25 +35,11 @@ namespace MQTTClient
         private static void DockerLifeTimeHandler_Starting(object sender, EventArgs e)
         {
             var client = new MqttClient("localhost"); //new MqttClient("davidber.ddns.net");
-            mqttService = new MqttService(client);
-            mqttService.OnMqttMessageReceived += OnClientOnMqttMessageReceived;
-            ConfigureServices();
+            var eventBus = EventBusFactory.GetEventBus();
+            mqttService = new MqttService(client, eventBus);
 
             mqttService.SimulateReceive();
         }        
-
-        private static void OnClientOnMqttMessageReceived(object sender, MqttMessageEventArgs e)
-        {
-            var @event = new NewMqttMessageEvent(e.Message);
-            eventBus.Publish(@event);
-            //TODO: Send through event bus (to SignalR)
-            //TODO: Handle HEllo message, subscribe to new topics etc...
-        }
-
-        private static void ConfigureServices()
-        {
-            eventBus = EventBusFactory.GetEventBus();            
-        }           
 
     }
 }

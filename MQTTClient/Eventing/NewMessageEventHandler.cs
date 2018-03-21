@@ -11,7 +11,7 @@ namespace IoT.Services.MqttServices.Eventing
     /// <summary>
     /// The evet handler for a message directed to a device.
     /// </summary>
-    class NewMessageEventHandler : IntegrationEventBase, IIntegrationEventHandler<NewMqttMessageEvent>
+    class NewMessageEventHandler : IIntegrationEventHandler
     {
         private MqttService mqttService;
 
@@ -20,9 +20,8 @@ namespace IoT.Services.MqttServices.Eventing
             mqttService = service;
         }
 
-        public async void Handle(NewMqttMessageEvent @event)
+        public  void Handle(IIntegrationEvent @event)
         {
-
             //Logger.Info($"Processing event: {@event.Message.Serialize()}");
             //await mqttService.Publish("testtopic/receive", @event.Message);
         }

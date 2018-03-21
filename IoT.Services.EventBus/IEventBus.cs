@@ -9,7 +9,7 @@ namespace IoT.Services.EventBus
         /// Publishes an event.
         /// </summary>
         /// <param name="event">The event.</param>
-        void Publish(IntegrationEventBase @event);
+        void Publish(IIntegrationEvent @event);
 
         /// <summary>
         /// Subscribes an event handler for an event.
@@ -17,7 +17,7 @@ namespace IoT.Services.EventBus
         /// <typeparam name="T">The event.</typeparam>
         /// <param name="action">The event handler.</param>
         void Subscribe<T>(IIntegrationEventHandler eventHandler)
-            where T : IntegrationEventBase;
+            where T : IIntegrationEvent;
 
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace IoT.Services.EventBus
         /// </summary>
         /// <typeparam name="T">The event.</typeparam>
         void Unsubscribe<T>()
-            where T : IntegrationEventBase;
+            where T : IIntegrationEvent;
 
         /// <summary>
         /// The flag indicating whether the connection is established.

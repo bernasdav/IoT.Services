@@ -26,21 +26,21 @@ namespace IoT.Services.EventBus
         /// <typeparam name="T">The integration event.</typeparam>
         /// <param name="action">The event handler delegate.</param>
         void AddSubscription<T>(IIntegrationEventHandler eventHandler)
-           where T : IntegrationEventBase;
+           where T : IIntegrationEvent;
 
         /// <summary>
         /// Removes a subscriptions. <seealso cref="IntegrationEventBase"/>
         /// </summary>
         /// <typeparam name="T">The integration event.</typeparam>
         void RemoveSubscription<T>()
-             where T : IntegrationEventBase;
+             where T : IIntegrationEvent;
 
         /// <summary>
         /// Checks if there is an event handler for the given event.
         /// </summary>
         /// <typeparam name="T">The integration event.</typeparam>
         /// <returns><c>True</c> if the event handler exists otherwise <c>False</c></returns>
-        bool HasSubscriptionsForEvent<T>() where T : IntegrationEventBase;
+        bool HasSubscriptionsForEvent<T>() where T : IIntegrationEvent;
 
         /// <summary>
         /// Checks if there is an event handler for the given event.

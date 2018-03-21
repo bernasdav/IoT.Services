@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace IoT.Services.Api.Channels
 {
 
-    class SignalRHub : Hub
+    public class SignalRHub : Hub
     {
 
         public SignalRHub()
